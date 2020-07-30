@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/30 11:56:31 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/07/30 15:31:40 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/07/30 16:10:54 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ typedef struct	s_shape
 	float	width;
 	float	height;
 	char	color;
-	struct s_shape	*next;
 }				t_shape;
 
 int	ft_strlen(char const *str)
