@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/03 12:01:22 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/05 16:57:08 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/08/05 18:34:46 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,19 +55,13 @@ int error_msg(char *msg, int ret)
 	return(ret);
 }
 
-int	check_zone(t_zone *zone)
-{
-	return (zone->width > 0 && zone->width <= 300
-			&& zone->height > 0 && zone->height <= 300);
-}
-
 int get_zone(FILE *file, t_zone *zone)
 {
 	int scanf_ret;
 
 	if ((scanf_ret = fscanf(file, "%d %d %c\n", &zone->width, &zone->height, &zone->background)) != 3 )
 		return (0);
-	if ((check_zone(zone)) == 0)
+	if (zone->width <= 0 || zone->width > 300 || zone->height <= 0 || zone->height > 300)
 		return (0);
 	if (scanf_ret == -1)
 		return (0);
@@ -96,12 +90,6 @@ int		in_rectangle(float x, float y, t_shape *shape)
 		|| ((y - shape->y < 1.00000000 || ((shape->y + shape->height) - y < 1.00000000))))
 		return (2);
 	return (1);
-}
-
-int	check_shape(t_shape *shape)
-{
-	return (shape->width > 0.00000000 && shape->height > 0.00000000
-			&& (shape->type == 'r' || shape->type == 'R'));
 }
 
 void fill_drawing(char **drawing, t_zone *zone, t_shape *shape)
@@ -133,7 +121,8 @@ int	get_shapes(FILE *file, t_zone *zone, char **drawing)
 
 	while ((scanf_ret = fscanf(file, "%c %f %f %f %f %c\n", &tmp.type, &tmp.x, &tmp.y, &tmp.width, &tmp.height, &tmp.color)) == 6)
 	{
-		if ((check_shape(&tmp)) == 0)
+		if (tmp.width <= 0.00000000 || tmp.height <= 0.00000000 
+			|| (tmp.type != 'r' && tmp.type != 'R'))
 			return (0);
 		fill_drawing(drawing, zone, &tmp);
 	}

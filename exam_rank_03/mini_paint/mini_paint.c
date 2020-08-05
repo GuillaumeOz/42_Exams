@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/30 11:58:59 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/07/30 16:04:20 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/08/05 18:35:53 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	draw_shape(t_zone *zone, char *drawing, t_shape *shape)
 {
 	int	y;
 	int	x;
-	int	is_it;
+	int	ret;
 
 	y = 0;
 	while (y < zone->height)
@@ -84,9 +84,9 @@ void	draw_shape(t_zone *zone, char *drawing, t_shape *shape)
 		x = 0;
 		while (x < zone->width)
 		{
-			is_it = in_circle((float)x, (float)y, shape);
-			if ((shape->type == 'c' && is_it == 2)
-				|| (shape->type == 'C' && is_it))
+			ret = in_circle((float)x, (float)y, shape);
+			if ((shape->type == 'c' && ret == 2)
+				|| (shape->type == 'C' && ret == 1))
 				drawing[(y * zone->width) + x] = shape->color;
 			x++;
 		}
@@ -123,7 +123,7 @@ void	draw_drawing(t_zone *zone, char *drawing)
 	}
 }
 
-int	str_error(char const *str)
+int	error_msg(char const *str)
 {
 	if (str)
 		write(1, str, ft_strlen(str));
@@ -137,7 +137,7 @@ int	clear_all(FILE *file, char *drawing, char const *str)
 	if (drawing)
 		free(drawing);
 	if (str)
-		str_error(str);
+		error_msg(str);
 	return (1);
 }
 
@@ -152,9 +152,9 @@ int	main(int argc, char **argv)
 	zone.background = 0;
 	drawing = NULL;
 	if (argc != 2)
-		return (str_error("Error: argument\n"));
+		return (error_msg("Error: argument\n"));
 	if (!(file = fopen(argv[1], "r")))
-		return (str_error("Error: Operation file corrupted\n"));
+		return (error_msg("Error: Operation file corrupted\n"));
 	if (!(drawing = get_zone(file, &zone)))
 		return (clear_all(file, NULL, "Error: Operation file corrupted\n"));
 	if (!(draw_shapes(file, &zone, drawing)))
