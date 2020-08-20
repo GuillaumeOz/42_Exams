@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/07 14:33:08 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/07 15:28:42 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/08/20 17:56:03 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ int in_circle(float x, float y, t_shape *shape)
 {
 	float distance;
 
-	distance = sqrtf(pow(x - shape->x, 2.) + pow(y - shape->y, 2.));
+	distance = sqrtf(powf(x - shape->x, 2.) + powf(y - shape->y, 2.));
 	if (distance <= shape->rad)
 	{
 		if (shape->rad - distance < 1.00000000)

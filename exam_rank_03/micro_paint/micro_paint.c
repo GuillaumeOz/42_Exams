@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/03 12:01:22 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/07 14:17:02 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/08/20 17:55:05 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void draw_drawing(char *drawing, t_zone *zone)
 	i = 0;
 	while ( i < zone->height)
 	{
-		write(1, drawing + (i * zone->height), zone->width);
+		write(1, drawing + (i * zone->width), zone->width);
 		write(1, "\n", 1);
 		i++;
 	}
