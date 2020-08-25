@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/07 14:33:08 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/20 17:56:03 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/08/25 15:30:01 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int get_zone(FILE *file, t_zone *zone)
 
 	if ((scanf_ret = fscanf(file, "%d %d %c\n", &zone->width, &zone->height, &zone->background)) != 3)
 		return (0);
-	if (zone->width <= 0 || zone->height <= 0 || zone->width > 300 || zone->width > 300)
+	if (zone->width <= 0 || zone->height <= 0 || zone->width > 300 || zone->height > 300)
 		return (0);
 	if (scanf_ret == -1)
 		return (0);
