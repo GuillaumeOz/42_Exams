@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/07 14:33:08 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/25 15:30:01 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/09/01 18:50:42 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,40 +81,43 @@ char	*malloc_drawing(t_zone *zone)
 	return (drawing);
 }
 
-int in_circle(float x, float y, t_shape *shape)
+void empty_circle(char *drawing, t_zone *zone, t_shape *shape)
 {
-	float distance;
+	int y;
+	int x;
 
-	distance = sqrtf(powf(x - shape->x, 2.) + powf(y - shape->y, 2.));
-	if (distance <= shape->rad)
+	y = 0;
+	while (y < zone->height)
 	{
-		if (shape->rad - distance < 1.00000000)
-			return (2);
-		return (1);
-	}
-	return (0);
+		x = 0;
+		while (x < zone->width)
+		{
+			if (sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad <= 0 
+				&& sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad > -1)
+				drawing[(y * zone->width) + x] = shape->color;
+			x++;
+		}
+		y++;
+	}	
 }
 
-void	fill_drawing(char *drawing, t_zone *zone, t_shape *shape)
+void full_circle(char *drawing, t_zone *zone, t_shape *shape)
 {
-	int i;
-	int j;
-	int ret;
+	int y;
+	int x;
 
-	i = 0;
-	while (i < zone->height)
+	y = 0;
+	while (y < zone->height)
 	{
-		j = 0;
-		while (j < zone->width)
+		x = 0;
+		while (x < zone->width)
 		{
-			ret = in_circle((float)j, (float)i, shape);
-			if ((shape->type == 'c' && ret == 2)
-				|| (shape->type == 'C' && ret))
-				drawing[(i * zone->width) + j] = shape->color;
-			j++;
+			if (sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad <= 0)
+				drawing[(y * zone->width) + x] = shape->color;
+			x++;
 		}
-		i++;
-	}
+		y++;
+	}	
 }
 
 int get_shapes(FILE *file, t_zone *zone, char *drawing)
@@ -126,7 +129,10 @@ int get_shapes(FILE *file, t_zone *zone, char *drawing)
 	{
 		if (tmp.rad <= 0 || ( tmp.type != 'c' && tmp.type != 'C'))
 			return (0);
-		fill_drawing(drawing, zone, &tmp);
+		if (tmp.type == 'c')
+			empty_circle(drawing, zone, &tmp);
+		if (tmp.type == 'C')
+			full_circle(drawing, zone, &tmp);
 	}
 	if (scanf_ret != -1)
 		return (0);

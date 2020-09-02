@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/03 12:01:22 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/08/20 17:55:05 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/09/02 12:57:25 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,40 +81,53 @@ char	*malloc_drawing(t_zone *zone)
 	return (drawing);
 }
 
-int	in_rectangle(float x, float y, t_shape *shape)
-{
-	if (((x < shape->x || (shape->x + shape->width < x))
-		|| (y < shape->y)) || (shape->y + shape->height < y))
-		return (0);
-	if (((x - shape->x < 1.00000000) || ((shape->x + shape->width) - x < 1.00000000)) ||
-	((y - shape->y < 1.00000000 || ((shape->y + shape->height) - y < 1.00000000))))
-		return (2);
-	return (1);
-}
+//Si 1 point est définis par (Xa, Ya)
+// Et qu'un rectangle est defini par son coin en haut a gauche (Xtl, Ytl) et son coin en bas a droite (Xbr, Ybr)
+// If Xtl <= Xa <= Xbr and Ytl <= Ya <= Ybr alors le point est dans le rectangle
 
-void get_shape(char **drawing, t_zone *zone, t_shape *shape)
+void empty_rectangle(char *drawing, t_zone *zone, t_shape *shape)
 {
-	int i;
-	int j;
-	int ret;
+	int y;
+	int x;
 
-	i = 0;
-	while (i < zone->height)
+	y = 0;
+	while (y < zone->height && shape->y + y < zone->height)
 	{
-		j = 0;
-		while (j < zone->width)
+		x = 0;
+		while (x < zone->width && shape->x + x < zone->width)
 		{
-			ret = in_rectangle(j, i, shape);
-			if ((shape->type == 'r' && ret == 2)
-			|| (shape->type == 'R' && ret))
-				(*drawing)[(i * zone->width) + j] = shape->color;
-			j++;
+			if (x == 0 || y == 0 || x == shape->width - 1 || y == shape->height - 1)
+				drawing[(y * zone->height) + x] = shape->color;
+			x++;
 		}
-		i++;
+		y++;
 	}
 }
 
-int get_shapes(FILE *file, t_zone *zone, char **drawing)
+//Si 1 point est définis par (Xa, Ya)
+// Et qu'un rectangle est defini par son coin en haut a gauche (Xtl, Ytl) et son coin en bas a droite (Xbr, Ybr)
+// If Xtl <= Xa <= Xbr and Ytl <= Ya <= Ybr alors le point est dans le rectangle
+
+
+void full_rectangle(char *drawing, t_zone *zone, t_shape *shape)
+{
+	int y;
+	int x;
+
+	y = 0;
+	while (y < shape->height && shape->y + y < zone->height)
+	{
+		x = 0;
+		while (x < shape->width && shape->x + x < zone->width)
+		{
+			drawing[(y * zone->height) + x] = shape->color;
+			x++;
+		}
+		y++;
+	}
+}
+
+int get_shapes(FILE *file, t_zone *zone, char *drawing)
 {
 	int	scanf_ret;
 	t_shape	tmp;
@@ -123,7 +136,10 @@ int get_shapes(FILE *file, t_zone *zone, char **drawing)
 	{
 		if (tmp.width <= 0.00000000 || tmp.height <= 0.00000000 || (tmp.type != 'r' && tmp.type != 'R'))
 			return (0);
-		get_shape(drawing, zone, &tmp);
+		if (tmp.type == 'R')
+			full_rectangle(drawing, zone, &tmp);
+		if (tmp.type == 'r')
+			empty_rectangle(drawing, zone, &tmp);
 	}
 	if (scanf_ret != -1)
 		return (0);
@@ -160,7 +176,7 @@ int main(int argc, char **argv)
 		return(clear_all(file, NULL) && error_msg("Error: Operation file corrupted\n", 1));
 	if (!(drawing = malloc_drawing(&zone)))
 		return(clear_all(file, NULL) && error_msg("Error: Malloc\n", 1));
-	if (!(get_shapes(file, &zone, &drawing)))
+	if (!(get_shapes(file, &zone, drawing)))
 		return(clear_all(file, drawing) && error_msg("Error: Operation file corrupted\n", 1));
 	draw_drawing(drawing, &zone);
 	clear_all(file, drawing);
