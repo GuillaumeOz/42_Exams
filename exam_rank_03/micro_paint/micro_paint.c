@@ -6,7 +6,7 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/03 12:01:22 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/09/02 12:57:25 by gozsertt         ###   ########.fr       */
+/*   Updated: 2020/09/02 19:37:45 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,33 +81,26 @@ char	*malloc_drawing(t_zone *zone)
 	return (drawing);
 }
 
-//Si 1 point est définis par (Xa, Ya)
-// Et qu'un rectangle est defini par son coin en haut a gauche (Xtl, Ytl) et son coin en bas a droite (Xbr, Ybr)
-// If Xtl <= Xa <= Xbr and Ytl <= Ya <= Ybr alors le point est dans le rectangle
-
 void empty_rectangle(char *drawing, t_zone *zone, t_shape *shape)
 {
 	int y;
 	int x;
 
 	y = 0;
-	while (y < zone->height && shape->y + y < zone->height)
+	while (y < zone->height)
 	{
 		x = 0;
-		while (x < zone->width && shape->x + x < zone->width)
+		while (x < zone->width)
 		{
-			if (x == 0 || y == 0 || x == shape->width - 1 || y == shape->height - 1)
-				drawing[(y * zone->height) + x] = shape->color;
+			if ((shape->x <= x && x <= (shape->x + shape->width)) && (shape->y <= y && y <= (shape->y + shape->height)))
+					if (((x - shape->x < 1.00000000) || ((shape->x + shape->width) - x < 1.00000000)) ||
+						((y - shape->y < 1.00000000 || ((shape->y + shape->height) - y < 1.00000000))))
+					drawing[(y * zone->width) + x] = shape->color;
 			x++;
 		}
 		y++;
 	}
 }
-
-//Si 1 point est définis par (Xa, Ya)
-// Et qu'un rectangle est defini par son coin en haut a gauche (Xtl, Ytl) et son coin en bas a droite (Xbr, Ybr)
-// If Xtl <= Xa <= Xbr and Ytl <= Ya <= Ybr alors le point est dans le rectangle
-
 
 void full_rectangle(char *drawing, t_zone *zone, t_shape *shape)
 {
@@ -115,12 +108,13 @@ void full_rectangle(char *drawing, t_zone *zone, t_shape *shape)
 	int x;
 
 	y = 0;
-	while (y < shape->height && shape->y + y < zone->height)
+	while (y < zone->height)
 	{
 		x = 0;
-		while (x < shape->width && shape->x + x < zone->width)
+		while (x < zone->width)
 		{
-			drawing[(y * zone->height) + x] = shape->color;
+			if ((shape->x <= x && x <= (shape->x + shape->width)) && (shape->y <= y && y <= (shape->y + shape->height)))
+				drawing[(y * zone->width) + x] = shape->color;
 			x++;
 		}
 		y++;
