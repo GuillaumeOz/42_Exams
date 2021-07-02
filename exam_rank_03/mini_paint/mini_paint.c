@@ -6,30 +6,30 @@
 /*   By: gozsertt <gozsertt@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/07 14:33:08 by gozsertt          #+#    #+#             */
-/*   Updated: 2020/09/02 19:40:00 by gozsertt         ###   ########.fr       */
+/*   Updated: 2021/07/02 12:52:33 by gozsertt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <math.h>
 
-typedef struct s_zone
+typedef struct	s_zone
 {
-	int		width;
-	int		height;
+	int     width;
+	int     height;
 	char	background;
-}		t_zone;
+}				t_zone;
 
-typedef struct s_shape
+typedef struct	s_shape
 {
 	char	type;
 	float	x;
 	float	y;
 	float	rad;
 	char	color;
-}		t_shape;
+}				t_shape;
 
 int ft_strlen(char *str)
 {
@@ -41,112 +41,125 @@ int ft_strlen(char *str)
 	return (i);
 }
 
-int clear_all(FILE *file, char *drawing)
-{
-	fclose(file);
-	if (!drawing)
-		free(drawing);
-	return (1);
-}
-
-int error_msg(char *msg)
+void	error_msg(char *msg)
 {
 	write(1, msg, ft_strlen(msg));
-	return(1);
 }
 
-int get_zone(FILE *file, t_zone *zone)
+int	create_zone(FILE *file, t_zone *zone)
 {
-	int scanf_ret;
+	int fscanf_ret;
 
-	if ((scanf_ret = fscanf(file, "%d %d %c\n", &zone->width, &zone->height, &zone->background)) != 3)
-		return (0);
-	if (zone->width <= 0 || zone->height <= 0 || zone->width > 300 || zone->height > 300)
-		return (0);
-	if (scanf_ret == -1)
-		return (0);
-	return (1);
+	fscanf_ret = fscanf(file, "%d %d %c\n", &zone->width, &zone->height, &zone->background);
+	if (fscanf_ret != 3)
+		return (1);
+	if (zone->width <= 0 || zone->width > 300 || zone->height <= 0 || zone->height > 300)
+		return (1);
+	return (0);
 }
 
-char	*malloc_drawing(t_zone *zone)
+char	*malloc_area(t_zone *zone)
 {
-	char *drawing;
+	char *area;
 	int i;
 
-	if (!(drawing = (char*)malloc(sizeof(char) * (zone->width * zone->height))))
+	area = (char *)malloc(sizeof(char) * (zone->height * zone->width));
+	if (area == NULL)
 		return (NULL);
 	i = 0;
-	while (i < zone->height * zone->width)
-		drawing[i++] = zone->background;
-	return (drawing);
-}
-
-void empty_circle(char *drawing, t_zone *zone, t_shape *shape)
-{
-	int y;
-	int x;
-
-	y = 0;
-	while (y < zone->height)
+	while (i < (zone->height * zone->width))
 	{
-		x = 0;
-		while (x < zone->width)
-		{
-			if (sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad <= 0 
-				&& sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad > -1)
-				drawing[(y * zone->width) + x] = shape->color;
-			x++;
-		}
-		y++;
-	}	
-}
-
-void full_circle(char *drawing, t_zone *zone, t_shape *shape)
-{
-	int y;
-	int x;
-
-	y = 0;
-	while (y < zone->height)
-	{
-		x = 0;
-		while (x < zone->width)
-		{
-			if (sqrtf(powf((shape->x - x), 2) + powf((shape->y - y), 2)) - shape->rad <= 0)
-				drawing[(y * zone->width) + x] = shape->color;
-			x++;
-		}
-		y++;
-	}	
-}
-
-int get_shapes(FILE *file, t_zone *zone, char *drawing)
-{
-	t_shape tmp;
-	int		scanf_ret;
-
-	while ((scanf_ret = fscanf(file, "%c %f %f %f %c\n", &tmp.type, &tmp.x, &tmp.y, &tmp.rad, &tmp.color)) == 5)
-	{
-		if (tmp.rad <= 0 || ( tmp.type != 'c' && tmp.type != 'C'))
-			return (0);
-		if (tmp.type == 'c')
-			empty_circle(drawing, zone, &tmp);
-		if (tmp.type == 'C')
-			full_circle(drawing, zone, &tmp);
+		area[i] = zone->background;
+		i++;
 	}
-	if (scanf_ret != -1)
+	return (area);
+}
+
+float calc_dist(float xa, float ya, float xb, float yb)
+{
+	float x_dist;
+	float y_dist;
+	float ret;
+
+	x_dist = (xa - xb) * (xa - xb);
+	y_dist = (ya - yb) * (ya - yb);
+	ret = sqrtf(x_dist + y_dist);
+	return (ret);
+}
+
+void	full_circle(t_zone *zone, t_shape *shape, char *area)
+{
+	int x;
+	int y;
+	float dist;
+
+	y = 0;
+	while (y < zone->height)
+	{
+		x = 0;
+		while (x < zone->width)
+		{
+			dist = calc_dist(x, y, shape->x, shape->y);
+			dist = dist - shape->rad;
+			if (dist <= 0.00000000)
+				area[x + (y * zone->width)] = shape->color;
+			x++;
+		}
+		y++;
+	}
+}
+
+void	empty_circle(t_zone *zone, t_shape *shape, char *area)
+{
+	int x;
+	int y;
+	float dist;
+
+	y = 0;
+	while (y < zone->height)
+	{
+		x = 0;
+		while (x < zone->width)
+		{
+			dist = calc_dist(x, y, shape->x, shape->y);
+			dist = dist - shape->rad;
+			if (dist <= 0.00000000)
+				if (dist > -1.00000000)
+					area[x + (y * zone->width)] = shape->color;
+			x++;
+		}
+		y++;
+	}
+}
+
+int	create_shape(FILE *file, t_zone *zone, t_shape *shape, char *area)
+{
+	int fscanf_ret;
+
+	while ((fscanf_ret = fscanf(file, "%c %f %f %f %c\n", &shape->type, &shape->x, &shape->y, &shape->rad, &shape->color)) == 5)
+	{
+		if (shape->rad <= 0.00000000)
+			return (1);
+		if (shape->type != 'c' && shape->type != 'C')
+			return (1);
+		if (shape->type == 'c')
+			empty_circle(zone, shape, area);
+		else if (shape->type == 'C')
+			full_circle(zone, shape, area);
+	}
+	if (fscanf_ret == -1)
 		return (0);
 	return (1);
 }
 
-void draw_drawing(t_zone *zone, char *drawing)
+void	print_area(t_zone *zone, char *area)
 {
 	int i;
 
 	i = 0;
 	while (i < zone->height)
 	{
-		write(1, drawing + (i * zone->width), zone->width);
+		write(1, area + (i * zone->width), zone->width);
 		write(1, "\n", 1);
 		i++;
 	}
@@ -155,23 +168,43 @@ void draw_drawing(t_zone *zone, char *drawing)
 int main(int argc, char **argv)
 {
 	FILE	*file;
-	char	*drawing;
-	t_zone	zone;
+	t_zone 	zone;
+	t_shape	shape;
+	char	*area;
 
-	zone.width = 0;
-	zone.height = 0;
-	zone.background = 0;
 	if (argc != 2)
-		return (error_msg("Error: argument\n"));
-	if (!(file = fopen(argv[1], "r")))
-		return (error_msg("Error: Operation file corrupted\n"));
-	if (!(get_zone(file, &zone)))
-		return (clear_all(file, NULL) && error_msg("Error: Operation file corrupted\n"));
-	if (!(drawing = malloc_drawing(&zone)))
-		return (clear_all(file, NULL) && error_msg("Error: Malloc\n"));
-	if (!(get_shapes(file, &zone, drawing)))
-		return (clear_all(file, drawing) && error_msg("Error: Operation file corrupted\n"));
-	draw_drawing(&zone, drawing);
-	clear_all(file, drawing);
+	{
+		error_msg("Error: argument\n");
+		return (1);
+	}
+	file = fopen(argv[1], "r");
+	if (file == NULL)
+	{
+		error_msg("Error: Operation file corrupted\n");
+		return (1);
+	}
+	if (create_zone(file, &zone) == 1)
+	{
+		error_msg("Error: Operation file corrupted\n");
+		fclose(file);
+		return (1);
+	}
+	area = malloc_area(&zone);
+	if (area == NULL)
+	{
+		error_msg("Error: Operation file corrupted\n");
+		fclose(file);
+		return (1);
+	}
+	if (create_shape(file, &zone, &shape, area) == 1)
+	{
+		error_msg("Error: Operation file corrupted\n");
+		free(area);
+		fclose(file);
+		return (1);
+	}
+	print_area(&zone, area);
+	free(area);
+	fclose(file);
 	return (0);
 }
